@@ -9,7 +9,7 @@ defmodule GetRates.Data.DataController do
   def init(_opts) do
     :inets.start()
     :ssl.start()
-    data = req()
+    {:ok, data} = req()
 
     :timer.send_interval(15000, :get_rates_data)
 
@@ -33,7 +33,7 @@ defmodule GetRates.Data.DataController do
 
   def handle_info(:get_rates_data, state) do
     IO.puts("data updated")
-    data = req()
+    {:ok, data} = req()
     {:noreply, Map.put(state, :data, data)}
   end
   def handle_info(_msg, state) do
@@ -56,8 +56,8 @@ defmodule GetRates.Data.DataController do
     case :httpc.request('https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,BCH&tsyms=USD') do
       {:ok, {{_, 200, _}, _headers, data}} ->
         data_map = Poison.decode!(data)
-        handle_data(data_map)
-        data_map
+        res = handle_data(data_map)
+        {res, data_map}
       resp -> {:error, :wrong_response, resp}
     end
   end
@@ -74,7 +74,10 @@ defmodule GetRates.Data.DataController do
   end
 
   def store_crypto2currency(crypto_id, currency_id, value) do
-    {:ok, _} = Crypto2Currency.set_row(crypto_id, currency_id, value)
+    case Crypto2Currency.set_row(crypto_id, currency_id, value) do
+      {:ok, _} -> :ok
+      _ -> :error
+    end
   end
 
   def handle_data(map) do

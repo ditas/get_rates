@@ -22,8 +22,6 @@ defmodule HttpHandler do
   end
 
   def get_cost(%{"sum" => sum, "crypto" => crypto, "timestamp" => timestamp}) do
-#    {:ok, timestamp1} = Ecto.DateTime.cast(timestamp)
-
     GetRates.Data.DataController.get_rates(sum, crypto, @default_currency, timestamp)
   end
   def get_cost(%{"sum" => sum, "crypto" => crypto}) do
