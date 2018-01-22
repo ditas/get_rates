@@ -19,6 +19,10 @@ defmodule GetRates.Data.DataController do
   def handle_call(:get_rates_data, _from, state) do
     {:reply, Map.get(state, :data), state}
   end
+  def handle_call({:get_rates, {sum, crypto, currency, timestamp}}, _from, state) do
+    reply = handle_request(sum, crypto, currency, timestamp)
+    {:reply, reply, state}
+  end
   def handle_call(_msg, _from, state) do
     {:reply, :ok, state}
   end
@@ -41,6 +45,10 @@ defmodule GetRates.Data.DataController do
     GenServer.call(__MODULE__, :get_rates_data)
   end
 
+  def get_rates(sum, crypto, currency, timestamp) do
+    GenServer.call(__MODULE__, {:get_rates, {sum, crypto, currency, timestamp}})
+  end
+
 #  Internal functions
 
   # %{"BCH" => %{"USD" => 1754.41}, "BTC" => %{"USD" => 11380.26}, "ETH" => %{"USD" => 1031.33}}
@@ -57,19 +65,16 @@ defmodule GetRates.Data.DataController do
   def store_crypto(name) do
     crypto = %Crypto{name: name}
 #    changeset = Crypto.changeset(crypto, %{})
-    Db.Repo.insert(crypto)
+    {:ok, _} = Db.Repo.insert(crypto)
   end
 
   def store_currency(name) do
     currency = %Currency{name: name}
-    Db.Repo.insert(currency)
+    {:ok, _} = Db.Repo.insert(currency)
   end
 
   def store_crypto2currency(crypto_id, currency_id, value) do
-#    crypto2currency = %Crypto2Currency{fk_crypto: crypto_id, fk_currency: currency_id, value: value}
-#    Db.Repo.insert(crypto2currency)
-    Ecto.Adapters.SQL.query(Db.Repo, "INSERT INTO crypto2currency (fk_crypto, fk_currency, value) VALUES ($1, $2, $3)
-", [crypto_id, currency_id, value])
+    {:ok, _} = Crypto2Currency.set_row(crypto_id, currency_id, value)
   end
 
   def handle_data(map) do
@@ -83,5 +88,12 @@ defmodule GetRates.Data.DataController do
         store_crypto2currency(crypto_id, currency_id, Map.get(currency_map, ck))
       end)
     end)
+  end
+
+  def handle_request(sum, crypto, currency, timestamp) do
+    crypto_id = Crypto.get_id(crypto)
+    currency_id = Currency.get_id(currency)
+    price = Crypto2Currency.get_value(crypto_id, currency_id, timestamp)
+    {:ok, String.to_integer(sum) * price}
   end
 end

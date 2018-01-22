@@ -7,8 +7,9 @@ defmodule GetRates.GetRatesSup do
 
   def init(_) do
     children = [
-      supervisor(Db.Repo, []),
-      worker(GetRates.Data.DataController, [], restart: :permanent)
+      supervisor(Db.Repo, [], restart: :permanent),
+      worker(GetRates.Data.DataController, [], restart: :permanent),
+      worker(Plugstarter, [], restart: :permanent)
     ]
 
     supervise(children, strategy: :one_for_one)
