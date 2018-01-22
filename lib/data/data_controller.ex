@@ -66,8 +66,10 @@ defmodule GetRates.Data.DataController do
   end
 
   def store_crypto2currency(crypto_id, currency_id, value) do
-    crypto2currency = %Crypto2Currency{fk_crypto: crypto_id, fk_currency: currency_id, value: value}
-    Db.Repo.insert(crypto2currency)
+#    crypto2currency = %Crypto2Currency{fk_crypto: crypto_id, fk_currency: currency_id, value: value}
+#    Db.Repo.insert(crypto2currency)
+    Ecto.Adapters.SQL.query(Db.Repo, "INSERT INTO crypto2currency (fk_crypto, fk_currency, value) VALUES ($1, $2, $3)
+", [crypto_id, currency_id, value])
   end
 
   def handle_data(map) do
