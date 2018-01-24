@@ -96,7 +96,9 @@ defmodule GetRates.Data.DataController do
   def handle_request(sum, crypto, currency, timestamp) do
     crypto_id = Crypto.get_id(crypto)
     currency_id = Currency.get_id(currency)
-    price = Crypto2Currency.get_value(crypto_id, currency_id, timestamp)
-    {:ok, String.to_integer(sum) * price}
+    case Crypto2Currency.get_value(crypto_id, currency_id, timestamp) do
+      {:error, reason} -> {:error, reason}
+      {:ok, price} -> {:ok, String.to_integer(sum) * price}
+    end
   end
 end

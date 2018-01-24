@@ -14,14 +14,16 @@ defmodule Crypto2Currency do
   end
 
   def get_value(crypto_id, currency_id, :undefined) do
-    {:ok, %{rows: [[row]]}} = Ecto.Adapters.SQL.query(Db.Repo, "SELECT value FROM crypto2currency WHERE fk_crypto = $1 AND fk_currency = $2 AND timestamp::time >= now()::time - interval '15 second' order by timestamp desc limit 1", [crypto_id, currency_id])
-
-    IO.inspect(row)
-
-    row
+    case Ecto.Adapters.SQL.query(Db.Repo, "SELECT value FROM crypto2currency WHERE fk_crypto = $1 AND fk_currency = $2 AND timestamp::time >= now()::time - interval '15 second' AND timestamp::date = now()::date order by timestamp desc limit
+    1", [crypto_id, currency_id]) do
+      {:ok, %{rows: [[row]]}} -> {:ok, row}
+      _ -> {:error, "No data found for #{crypto_id} & #{currency_id}"}
+    end
   end
   def get_value(crypto_id, currency_id, timestamp) do
-    {:ok, %{rows: [[row]]}} = Ecto.Adapters.SQL.query(Db.Repo, "SELECT value FROM crypto2currency WHERE fk_crypto = $1 AND fk_currency = $2 AND timestamp::time >= to_timestamp($3, 'YYYY-MM-DD HH24:MI:SS')::time - interval '15 second' order by timestamp desc limit 1", [crypto_id, currency_id, timestamp])
-    row
+      case Ecto.Adapters.SQL.query(Db.Repo, "SELECT value FROM crypto2currency WHERE fk_crypto = $1 AND fk_currency = $2 AND timestamp::time >= to_timestamp($3, 'YYYY-MM-DD HH24:MI:SS')::time - interval '15 second' AND timestamp::date = to_timestamp($3, 'YYYY-MM-DD HH24:MI:SS')::date order by timestamp desc limit 1", [crypto_id, currency_id, timestamp]) do
+        {:ok, %{rows: [[row]]}} -> {:ok, row}
+        _ -> {:error, "No data found for #{crypto_id} & #{currency_id} & #{timestamp}"}
+      end
   end
 end
