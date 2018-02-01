@@ -7,9 +7,8 @@ defmodule GetRatesApp do
     dispatch_config = :cowboy_router.compile([
       { :_,
         [
-#          {"/", TestHandler, []},
-          {"/", :cowboy_static, {:priv_file, :get_rates, "index.html"}},
-          {"/static/[...]", :cowboy_static, {:priv_dir,  :get_rates, "static_files"}},
+          {"/", TestHandler, []},
+          {"/static/[...]", :cowboy_static, {:priv_dir,  :get_rates, "static"}},
           {"/rates", GetHandler, []},
           {"/websocket", WebsocketHandler, []},
         ]

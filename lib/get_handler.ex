@@ -36,4 +36,8 @@ defmodule GetHandler do
     {:error, :wrong_request}
   end
 
+  def get_all(timestamp) do
+    GetRates.Data.DataController.get_all(timestamp)
+  end
+
 end

@@ -16,4 +16,8 @@ defmodule Crypto do
   def get_id(name) do
     Crypto |> Db.Repo.get_by(name: name) |> Map.get(:id)
   end
+
+  def get_all() do
+    Crypto |> Db.Repo.all() |> Map.get(:id)
+  end
 end

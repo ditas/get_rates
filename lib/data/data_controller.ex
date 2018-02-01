@@ -23,6 +23,10 @@ defmodule GetRates.Data.DataController do
     reply = handle_request(sum, crypto, currency, timestamp)
     {:reply, reply, state}
   end
+  def handle_call({:get_all, timestamp}, _from, state) do
+    reply = handle_request(timestamp)
+    {:reply, reply, state}
+  end
   def handle_call(_msg, _from, state) do
     {:reply, :ok, state}
   end
@@ -47,6 +51,10 @@ defmodule GetRates.Data.DataController do
 
   def get_rates(sum, crypto, currency, timestamp) do
     GenServer.call(__MODULE__, {:get_rates, {sum, crypto, currency, timestamp}})
+  end
+
+  def get_all(timestamp) do
+    GenServer.call(__MODULE__, {:get_all, timestamp})
   end
 
 #  Internal functions
@@ -100,5 +108,20 @@ defmodule GetRates.Data.DataController do
       {:error, reason} -> {:error, reason}
       {:ok, price} -> {:ok, String.to_integer(sum) * price}
     end
+  end
+  def handle_request(timestamp) do
+    cryptos = Crypto.get_all()
+    currencies = Currency.get_all()
+    res = List.foldl(cryptos, [], fn(crypto_id, acc)->
+      List.foldl(currencies, [], fn(currency_id, acc1)->
+        case Crypto2Currency.get_value(crypto_id, currency_id, timestamp) do
+          {:error, reason} -> {:error, reason}
+          {:ok, price} -> [{crypto_id, currency_id, price}|acc1]
+        end
+      end)
+    end)
+
+    IO.inspect(res)
+
   end
 end

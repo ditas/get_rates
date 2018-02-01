@@ -73,26 +73,23 @@ defmodule TestHandler do
   """
   def build_body(request) do
     """
+      <!DOCTYPE html>
         <html>
         <head>
-          <title>Elixir Cowboy Dynamic Example</title>
-          <link rel='stylesheet' href='/static/css/styles.css' type='text/css' />
+        <title>Websocket Test</title>
+        <script src="/static/jquery.min.js"></script>
         </head>
-        <body>
-          <div id='main'>
-            <h1>Dynamic Page Example</h1>
-            <p>This page is rendered via the route: <code>{"/dynamic", DynamicPageHandler, []}</code>
-            <br/>
-            and the code for the handler can be found in <code>lib/dynamic_page_handler.ex</code>.</p>
 
-            <h2>Current Time (:erlang.now)</h2>
-            <p><span class='time'> #{inspect(:erlang.timestamp)}</span></p>
-            <p>Reload this page to see the time change.</p>
-            <h2>Your Request Headers</h2>
-            <dl>#{dl_headers(request)}</dl>
-          </div>
+        <body>
+          <ul>
+            <li><a href="http://localhost:8080/rates?sum=1&crypto=BTC&timestamp=2018-01-22 14:15:31">Rates by get request with timestamp (sum=1&crypto=BTC&timestamp=2018-01-22 14:15:31)
+  </a></li>
+            <li><a href="http://localhost:8080/rates?sum=1&crypto=ETH">Rates by get request without timestamp (sum=1&crypto=ETH)</a></li>
+            <li><a href="http://localhost:8080/static/websocket_test.html">Websocket test</a></li>
+          </ul>
         </body>
-        </html>
+
+      </html>
     """
   end
 
