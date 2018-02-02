@@ -1,7 +1,5 @@
 defmodule Crypto do
   use Ecto.Schema
-  import Ecto.Query
-  import Ecto.Changeset
 
   schema "cryptos" do
     field :name, :string
@@ -18,6 +16,8 @@ defmodule Crypto do
   end
 
   def get_all() do
-    Crypto |> Db.Repo.all() |> Map.get(:id)
+    Crypto |> Db.Repo.all() |> List.foldl([], fn(c, acc)->
+      [{Map.get(c, :id), Map.get(c, :name)}|acc]
+    end)
   end
 end

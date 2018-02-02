@@ -112,16 +112,14 @@ defmodule GetRates.Data.DataController do
   def handle_request(timestamp) do
     cryptos = Crypto.get_all()
     currencies = Currency.get_all()
-    res = List.foldl(cryptos, [], fn(crypto_id, acc)->
-      List.foldl(currencies, [], fn(currency_id, acc1)->
+    List.foldl(cryptos, [], fn({crypto_id, crypto_name}, acc)->
+      crypto_price = List.foldl(currencies, [], fn({currency_id, currrency_name}, _)->
         case Crypto2Currency.get_value(crypto_id, currency_id, timestamp) do
           {:error, reason} -> {:error, reason}
-          {:ok, price} -> [{crypto_id, currency_id, price}|acc1]
+          {:ok, price} -> {crypto_name, currrency_name, price}
         end
       end)
+      [crypto_price|acc]
     end)
-
-    IO.inspect(res)
-
   end
 end

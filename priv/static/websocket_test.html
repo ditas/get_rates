@@ -10,19 +10,13 @@
   <div id='dynamic'>
 
     <div id="push">
-      <h2>Asychronous pushes from server</h2>
-      <p>
-        The server periodically pushes a message containing the server time.  The JS
-        code writes that time into the page below, whenever such a message is received.
-      </p>
       <div>
-        <h3>Server Time: <span id='server_time' class='time'></span></h3>
+        <h3>Rates: <span id="rates"></span></h3>
       </div>
     </div>
 
     <div id="pull">
-      <h2>Synchronous pulls from server</h2>
-      <input id='message_string' placeholder='Enter a message'></input>
+      <input id='message_string' placeholder='2018-01-22 14:15:31'></input>
       <button id='send'>Send</button>
       <div>
         <h3>Server Reply: <span id='server_reply' class='reply'>&nbsp;</span></h3>
@@ -54,8 +48,8 @@ var SocketHandler = (function(){
   function onMessage(evt) { 
     //console.log(evt.data);
     message = JSON.parse(evt.data);
-    if ( message.time !== undefined) {
-      $('#server_time').html(message.time);
+    if ( message.rates !== undefined) {
+      $('#rates').html(message.rates);
     }
     if(message.reply !== undefined) {
       $('#server_reply').html(message.reply);

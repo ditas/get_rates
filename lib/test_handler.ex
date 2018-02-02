@@ -42,7 +42,7 @@ defmodule TestHandler do
       %{<<"content-type">> => <<"text/html">>},
 
       # body of reply.
-      build_body(request),
+      build_body(),
 
       # original request
       request
@@ -71,7 +71,7 @@ defmodule TestHandler do
   @doc """
   Assemble the body of a response in HTML.
   """
-  def build_body(request) do
+  def build_body() do
     """
       <!DOCTYPE html>
         <html>

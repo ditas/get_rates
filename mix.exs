@@ -26,9 +26,7 @@ defmodule GetRates.Mixfile do
       {:cowboy, "~> 2.2.2"},
       {:poison, "~> 3.1"},
       {:postgrex, "~> 0.13.3"},
-      {:ecto, "~> 2.2.8"},
-
-      {:jsex, "~> 2.0.0"}
+      {:ecto, "~> 2.2.8"}
     ]
   end
 end

@@ -10,7 +10,9 @@ defmodule Currency do
   end
 
   def get_all() do
-    Currency |> Db.Repo.all() |> Map.get(:id)
+    Currency |> Db.Repo.all() |> List.foldl([], fn(c, acc)->
+      [{Map.get(c, :id), Map.get(c, :name)}|acc]
+    end)
   end
 end
 

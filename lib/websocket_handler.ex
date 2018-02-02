@@ -5,39 +5,54 @@ defmodule WebsocketHandler do
    end
 
    def websocket_init(state) do
-#    :erlang.start_timer(1000, self(), 1)
     :erlang.start_timer(1000, self(), [])
     {:ok, state}
    end
 
-#   def websocket_handle({:text, msg}, state) do
-#     {:reply, {:text, "Test #{msg}"}, state}
-#   end
-#   def websocket_handle(_, state) do
-#     {:ok, state}
-#   end
+   def websocket_handle({:text, content}, state) do
 
-#   def websocket_info({:timeout, _ref, num}, state) do
-#     num1 = num + 1
-#     :erlang.start_timer(1000, self(), num1)
-#
-#     {:ok, message} = JSEX.encode(%{time: num1})
-#
-#     {:reply, {:text, message}, state}
-#   end
-#   def websocket_info(_, state) do
-#     {:ok, state}
-#   end
+#     IO.inspect(content)
+
+     {:ok, %{"message" => timestamp}} = Poison.decode(content)
+
+     IO.inspect(timestamp)
+
+     rates = GetHandler.get_all(timestamp)
+     rates_all = List.foldl(rates, [], fn(r, acc)->
+       res = Tuple.to_list(r) |> Enum.join(", ")
+       [res|acc]
+     end)
+
+#     IO.inspect(rates_all)
+
+     {:ok, message} = Poison.encode(%{reply: Enum.join(rates_all, "; ")})
+     {:reply, {:text, message}, state}
+   end
+   def websocket_handle(_msg, state) do
+     {:ok, state}
+   end
 
    def websocket_info({:timeout, _ref, _msg}, state) do
-     :erlang.start_timer(1000, self(), [])
+     :erlang.start_timer(15000, self(), [])
 
-     message = GetHandler.get_all(:undefined)
-     {:ok, message} = JSEX.encode(%{time: message})
+     rates = GetHandler.get_all(:undefined)
+
+#     IO.inspect(rates)
+
+     rates_all = List.foldl(rates, [], fn(r, acc)->
+        res = Tuple.to_list(r) |> Enum.join(", ")
+        [res|acc]
+     end)
+
+#     IO.inspect(rates_all)
+
+     {:ok, message} = Poison.encode(%{rates: Enum.join(rates_all, "; ")})
+
+#     IO.inspect(message)
 
      {:reply, {:text, message}, state}
    end
-   def websocket_info(_, state) do
+   def websocket_info(_msg, state) do
      {:ok, state}
    end
 
