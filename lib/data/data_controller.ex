@@ -71,14 +71,21 @@ defmodule GetRates.Data.DataController do
   end
 
   def store_crypto(name) do
-    crypto = %Crypto{name: name}
-#    changeset = Crypto.changeset(crypto, %{})
-    {:ok, _} = Db.Repo.insert(crypto)
+    case Crypto.get_id(name) do
+      :undefined ->
+        crypto = %Crypto{name: name}
+        {:ok, _} = Db.Repo.insert(crypto)
+      _ -> :ignore
+    end
   end
 
   def store_currency(name) do
-    currency = %Currency{name: name}
-    {:ok, _} = Db.Repo.insert(currency)
+    case Currency.get_id(name) do
+      :undefined ->
+        currency = %Currency{name: name}
+        {:ok, _} = Db.Repo.insert(currency)
+      _ -> :ignore
+    end
   end
 
   def store_crypto2currency(crypto_id, currency_id, value) do
@@ -89,6 +96,11 @@ defmodule GetRates.Data.DataController do
   end
 
   def handle_data(map) do
+    store_crypto("BTC")
+    store_crypto("BCH")
+    store_crypto("ETH")
+    store_currency("USD")
+
     crypto_keys = Map.keys(map)
     List.foldl(crypto_keys, [], fn(k, _)->
       crypto_id = Crypto.get_id(k)

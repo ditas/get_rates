@@ -12,7 +12,10 @@ defmodule Crypto do
 #  end
 
   def get_id(name) do
-    Crypto |> Db.Repo.get_by(name: name) |> Map.get(:id)
+    case Db.Repo.get_by(Crypto, name: name) do
+      nil -> :undefined
+      c -> Map.get(c, :id)
+    end
   end
 
   def get_all() do

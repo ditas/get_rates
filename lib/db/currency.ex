@@ -6,7 +6,10 @@ defmodule Currency do
   end
 
   def get_id(name) do
-    Currency |> Db.Repo.get_by(name: name) |> Map.get(:id)
+    case Db.Repo.get_by(Currency, name: name) do
+      nil -> :undefined
+      c -> Map.get(c, :id)
+    end
   end
 
   def get_all() do
@@ -15,6 +18,3 @@ defmodule Currency do
     end)
   end
 end
-
-
-#** (BadMapError) expected a map, got: [%Crypto{__meta__: #Ecto.Schema.Metadata<:loaded, "cryptos">, id: 1, name: "BTC"}, %Crypto{__meta__: #Ecto.Schema.Metadata<:loaded, "cryptos">, id: 2, name: "BCH"}, %Crypto{__meta__: #Ecto.Schema.Metadata<:loaded, "cryptos">, id: 3, name: "ETH"}]
